@@ -6,6 +6,7 @@
 ⚠️ 本脚本不含任何判定规则与方法细则——它们全部在服务端，需 API Key。
 
 用法：
+  python ask_api.py --machine-id              # 打印本机机器码（申请授权码用）
   python ask_api.py --health
   python ask_api.py --rules --ids R14,R1
   python ask_api.py --rules --keyword 同号
@@ -37,12 +38,71 @@ API = os.environ.get(
 KEY = os.environ.get('DRAWING_REVIEW_KEY', '')
 
 
+def machine_id():
+    """本机机器码（8 位）—— 授权码与这台机器绑死，换机器要重新申请。
+
+    取机器唯一标识的 SHA256 前 8 位，只上传哈希值，不上传原始信息：
+      Windows → 注册表 HKLM\\SOFTWARE\\Microsoft\\Cryptography\\MachineGuid
+      Linux   → /etc/machine-id
+      macOS   → ioreg IOPlatformUUID
+      兜底    → 主机名 + 网卡 MAC
+
+    同一台电脑上装多少个 Agent，算出来都是同一个码 —— 所以多 Agent 可以共用。
+    """
+    import hashlib
+    raw = []
+
+    # Windows
+    try:
+        import winreg
+        k = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                           r'SOFTWARE\Microsoft\Cryptography')
+        v, _ = winreg.QueryValueEx(k, 'MachineGuid')
+        winreg.CloseKey(k)
+        if v:
+            raw.append(str(v))
+    except Exception:
+        pass
+
+    # Linux
+    try:
+        with open('/etc/machine-id') as f:
+            v = f.read().strip()
+        if v:
+            raw.append(v)
+    except Exception:
+        pass
+
+    # macOS
+    try:
+        import subprocess
+        out = subprocess.run(['ioreg', '-rd1', '-c', 'IOPlatformExpertDevice'],
+                             capture_output=True, text=True, timeout=5).stdout
+        for line in out.splitlines():
+            if 'IOPlatformUUID' in line:
+                raw.append(line.split('=')[-1].strip().strip('"'))
+                break
+    except Exception:
+        pass
+
+    # 兜底
+    if not raw:
+        import socket
+        import uuid
+        raw.append(socket.gethostname())
+        raw.append(str(uuid.getnode()))
+
+    h = hashlib.sha256(('drawing-review:v1:' + '|'.join(raw)).encode('utf-8')).hexdigest()
+    return h[:8].upper()
+
+
 def call(path, payload=None):
     url = API + path
     data = json.dumps(payload or {}, ensure_ascii=False).encode('utf-8')
     req = urllib.request.Request(url, data=data, method='POST',
                                  headers={'Content-Type': 'application/json',
-                                          'X-API-Key': KEY})
+                                          'X-API-Key': KEY,
+                                          'X-Machine-Id': machine_id()})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             return r.status, json.loads(r.read().decode('utf-8'))
@@ -71,7 +131,20 @@ def main():
     ap.add_argument('--method', nargs='*', metavar='TOPIC [PART]',
                     help='方法库：--method list / --method 主题 / --method 主题 段号')
     ap.add_argument('--outline', action='store_true', help='配合 --method 使用：只看该主题分段')
+    ap.add_argument('--machine-id', action='store_true',
+                    help='只打印本机机器码（申请授权码时把这串发给作者）')
     a = ap.parse_args()
+
+    # 只打印机器码：不需要 key、不联网
+    if a.machine_id:
+        mid = machine_id()
+        print(f'M-{mid[:4]}-{mid[4:]}')
+        print('\n这是本机机器码，授权码会和它绑死。')
+        print('· 同一台电脑换多少个 AI 工具（WorkBuddy / Claude Code / Cursor…）都用这一个码')
+        print('· 换电脑要重新申请')
+        print('\n申请授权码时，把这串发给作者即可：')
+        print(f'  M-{mid[:4]}-{mid[4:]}')
+        return 0
 
     if a.health:
         code, d = call('/v1/health')
