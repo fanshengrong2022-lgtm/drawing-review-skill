@@ -184,9 +184,25 @@ def main():
         return 1
 
     if code == 402:
-        print('⚠️ Key 缺失或无效：')
+        body = d.get('body') if isinstance(d, dict) else None
+        reason = body.get('reason') if isinstance(body, dict) else ''
+        tips = {
+            'missing-key': '没设置环境变量 DRAWING_REVIEW_KEY',
+            'missing-machine': '客户端没带机器码 —— 请用 v2.1.0 及以上版本的 ask_api.py',
+            'machine-mismatch': '这枚码绑的不是这台电脑；换电脑需重新申请',
+            'expired': '已过到期日（码里写着哪天到期），找作者续期即可',
+            'legacy-key-retired': '这是旧格式的码，已作废，需重新申请',
+            'invalid-signature': '码被改过，或不是本系统签发',
+            'invalid-date': '码里的到期日不是有效日期',
+            'invalid-key': '码格式不对（应为 skfg-YYYYMMDD-XXXXXX-XXXXXXXX-XXXXXXXX）',
+        }
+        print('⚠️ 授权未通过：' + tips.get(reason, 'Key 缺失或无效'))
+        if reason:
+            print('   原因代码：%s' % reason)
         print(json.dumps(d, ensure_ascii=False, indent=2))
-        print('\n→ 向作者申请 API Key 后设置环境变量 DRAWING_REVIEW_KEY')
+        if reason in ('machine-mismatch', 'missing-key', 'legacy-key-retired', 'expired'):
+            print('\n→ 取本机机器码：python scripts/ask_api.py --machine-id')
+            print('→ 把机器码发给作者申领授权码，再设为 DRAWING_REVIEW_KEY')
         return 2
     if code == 0:
         print('⚠️ 连不上服务：')
