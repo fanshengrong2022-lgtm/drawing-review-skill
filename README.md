@@ -18,12 +18,13 @@
 ├── SKILL.md              入口（九个章节：能力 / 触发 / 加载顺序 / 边界 / 云端 / 八条错 / 顺序 / 适用范围 / 包含什么）
 ├── INSTALL.md            安装说明
 ├── references/           方法骨架 × 9
-└── scripts/              5 个脚本
+└── scripts/              6 个脚本
     ├── ask_api.py              云端判定引擎客户端
     ├── health_check.py         图纸体检单
     ├── report_check.py         报告自检
     ├── extract_hatch_leader.py 填充 / 引线提取
-    └── extract_material_tags.py 跨块拼装材料标注提取
+    ├── extract_material_tags.py 跨块拼装材料标注提取
+    └── grid_align.py           轴网提取与跨图比对（叠图）
 ```
 
 ## 它解决什么问题

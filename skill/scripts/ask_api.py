@@ -186,23 +186,14 @@ def main():
     if code == 402:
         body = d.get('body') if isinstance(d, dict) else None
         reason = body.get('reason') if isinstance(body, dict) else ''
-        tips = {
-            'missing-key': '没设置环境变量 DRAWING_REVIEW_KEY',
-            'missing-machine': '客户端没带机器码 —— 请用 v2.1.0 及以上版本的 ask_api.py',
-            'machine-mismatch': '这枚码绑的不是这台电脑；换电脑需重新申请',
-            'expired': '已过到期日（码里写着哪天到期），找作者续期即可',
-            'legacy-key-retired': '这是旧格式的码，已作废，需重新申请',
-            'invalid-signature': '码被改过，或不是本系统签发',
-            'invalid-date': '码里的到期日不是有效日期',
-            'invalid-key': '码格式不对（应为 skfg-YYYYMMDD-XXXXXX-XXXXXXXX-XXXXXXXX）',
-        }
-        print('⚠️ 授权未通过：' + tips.get(reason, 'Key 缺失或无效'))
+        # v2.1.1 起云端对外只返回统一 invalid-key（细分原因只进服务端日志），
+        # 客户端按通用话术提示，覆盖最常见的三种情况
+        print('⚠️ 授权未通过：Key 无效、已过期，或不匹配这台电脑。')
         if reason:
             print('   原因代码：%s' % reason)
         print(json.dumps(d, ensure_ascii=False, indent=2))
-        if reason in ('machine-mismatch', 'missing-key', 'legacy-key-retired', 'expired'):
-            print('\n→ 取本机机器码：python scripts/ask_api.py --machine-id')
-            print('→ 把机器码发给作者申领授权码，再设为 DRAWING_REVIEW_KEY')
+        print('\n→ 取本机机器码：python scripts/ask_api.py --machine-id')
+        print('→ 把机器码发给作者重新申领授权码，再设为 DRAWING_REVIEW_KEY')
         return 2
     if code == 0:
         print('⚠️ 连不上服务：')
