@@ -1,0 +1,33 @@
+# 绝对不进仓库的东西（防误传）
+_fallback_backup*/
+_full_references*/
+cloudbase_*/
+gen_keys.py
+授权码发放记录.csv
+*.env
+.env
+.env.*
+*交接文件*
+*交接*.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# 产出与临时
+02_产出/
+03_測試記錄/
+03_测试记录/
+*.log
+*.tmp
+~$*
