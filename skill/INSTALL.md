@@ -38,8 +38,9 @@ https://api.skillhub.cn/api/v1/download?slug=@user_ae723d96/drawing-review-free
 要求：
 1. 下载下来是 zip，解压后放进你的技能目录，目录名用 drawing-review
 2. 目录结构必须是 drawing-review/SKILL.md 和 drawing-review/references/ 同级
-3. 装完读一遍 SKILL.md，告诉我 version 是几、references 有几个文件
-4. 不要改写 SKILL.md 和 references 里的任何内容
+3. 把授权码 <你的授权码> 单独写一行存成 drawing-review/key.txt（和 SKILL.md 同级，只放这一行码）
+4. 装完读一遍 SKILL.md，告诉我 version 是几、references 有几个文件
+5. 不要改写 SKILL.md 和 references 里的任何内容
 ```
 
 装完 AI 应该报：**version 2.6.1 / references 10 个 / scripts 7 个**。
@@ -70,16 +71,28 @@ https://api.skillhub.cn/api/v1/download?slug=@user_ae723d96/drawing-review-free
    > 同一台电脑上装多少个 AI 工具（WorkBuddy / Claude Code / Cursor / Trae…）
    > 算出来都是同一个机器码，**一个码可以多工具共用**。
 
-2. **填授权码（只有一个变量）**
+2. **填授权码（推荐用 key.txt，不碰环境变量）**
+
+   **A · 最简单：存成一个文件**（v2.6.2 起支持）
+
+   在 `drawing-review/` 目录下（和 `SKILL.md` 同级）新建 `key.txt`，里面**只放一行**：
+
+   ```
+   skfg-你的授权码
+   ```
+
+   脚本会自动读它 —— 不用设环境变量、不用重开终端、重装也还在。
+
+   **B · 环境变量**（老办法，仍支持，优先级高于 key.txt）
 
    **Windows · 命令行（CMD）**
    ```bat
-   set DRAWING_REVIEW_KEY=skfg-你的授权码
+   setx DRAWING_REVIEW_KEY "skfg-你的授权码"
    ```
 
    **Windows · PowerShell**
    ```powershell
-   $env:DRAWING_REVIEW_KEY="skfg-你的授权码"
+   [Environment]::SetEnvironmentVariable("DRAWING_REVIEW_KEY","skfg-你的授权码","User")
    ```
 
    **Mac / Linux**
@@ -87,7 +100,9 @@ https://api.skillhub.cn/api/v1/download?slug=@user_ae723d96/drawing-review-free
    export DRAWING_REVIEW_KEY="skfg-你的授权码"
    ```
 
-   > 服务地址已内置，**不用配**。
+   > ⚠️ 用 `set` / `export` 只在**当前窗口**有效，关掉或换个终端就没了 ——
+   > 这就是"明明设了却说没有授权码"最常见的原因。要么用 `setx`，要么用上面的 key.txt。
+   > 服务地址已内置，不用配。
    > 想让 AI 每次都自动带上，可以把这行写进系统环境变量，或者直接告诉 AI：
    > 「把 DRAWING_REVIEW_KEY 设为 skfg-你的授权码，然后用审图技能帮我审图」。
 
@@ -98,7 +113,7 @@ https://api.skillhub.cn/api/v1/download?slug=@user_ae723d96/drawing-review-free
    python scripts/ask_api.py --rules --ids R14   # 能返回规则说明 = 授权码有效
    ```
 
-   - 返回 `ok:true` 但 `--rules` 报 402 → **授权码不对或过期**
+   - 返回 `ok:true` 但 `--rules` 报 402 → 脚本会打出**本机机器码**和**当前用的码**：机器码变了 = 换了电脑（一机一码，找作者换码）；机器码没变 = 码抄错或过期
    - 连不上 → 检查网络，或让 AI 直接读 `references/00-索引.md`
 
 ## 开始用

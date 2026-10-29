@@ -14,7 +14,7 @@
 包内只有**流程骨架**；**判定能力在云端**（19 条判定规则 + **1,851 条**审图条目：房建 1,571 / 道路 70 / 排水 77 / 桥梁 91 / 市政通用 42 + **10 主题 83 段**方法库，约 7.7 万字），凭授权码按次调用。
 
 ```
-drawing-review/           ← 当前版本 v2.6.1
+drawing-review/           ← 当前版本 v2.6.2
 ├── SKILL.md              入口（先读这个，§3.0 是傻瓜默认剧本）
 ├── INSTALL.md            安装说明（含一键安装提示词）
 ├── references/           方法骨架 × 10
@@ -72,11 +72,12 @@ https://api.skillhub.cn/api/v1/download?slug=@user_ae723d96/drawing-review-free
 要求：
 1. 下载下来是 zip，解压后放进你的技能目录，目录名用 drawing-review
 2. 目录结构必须是 drawing-review/SKILL.md 和 drawing-review/references/ 同级
-3. 装完读一遍 SKILL.md，告诉我 version 是几、references 有几个文件
-4. 不要改写 SKILL.md 和 references 里的任何内容
+3. 把授权码单独写一行，存成 drawing-review/key.txt（和 SKILL.md 同级）
+4. 装完读一遍 SKILL.md，告诉我 version 是几、references 有几个文件
+5. 不要改写 SKILL.md 和 references 里的任何内容
 ```
 
-装完 AI 应该报：**version 2.6.1 / references 10 个 / scripts 7 个**。
+装完 AI 应该报：**version 2.6.2 / references 10 个 / scripts 7 个**。
 报不出来，通常是解压多套了一层目录，或者放错了位置。
 
 ## 手动安装

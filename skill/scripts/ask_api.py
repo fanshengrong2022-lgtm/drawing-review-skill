@@ -21,7 +21,8 @@
   python ask_api.py --method five-steps 3           # 取第 3 段正文
 
 配置（环境变量）：
-  DRAWING_REVIEW_KEY   API Key（向作者申请）
+  DRAWING_REVIEW_KEY   API Key（向作者申请）；没设时自动读 skill 目录下的 key.txt
+                       把码单独写一行存成 key.txt 即可，不依赖终端环境变量
   DRAWING_REVIEW_API   服务地址（已内置，一般不用配）
 """
 import os
@@ -35,7 +36,35 @@ API = os.environ.get(
     'DRAWING_REVIEW_API',
     'https://drawing-review-d1g4mjq96a0f1cdcc-1510749119.ap-shanghai.app.tcloudbase.com'
 ).rstrip('/')
-KEY = os.environ.get('DRAWING_REVIEW_KEY', '')
+def _read_key_file():
+    """环境变量没设时，从 skill 目录下的 key.txt 读授权码。
+
+    找三个位置（哪个先有算哪个）：scripts/、skill 根目录、当前工作目录。
+    文件里只放一行 skfg- 开头的码即可，多余的文字不管。
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    for p in (os.path.join(here, 'key.txt'),
+              os.path.join(os.path.dirname(here), 'key.txt'),
+              os.path.join(os.getcwd(), 'key.txt')):
+        try:
+            if not os.path.isfile(p):
+                continue
+            with open(p, encoding='utf-8-sig', errors='ignore') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith('skfg-'):
+                        return line, p
+        except Exception:
+            continue
+    return '', ''
+
+
+KEY = (os.environ.get('DRAWING_REVIEW_KEY') or '').strip()
+if KEY:
+    KEY_SRC = '环境变量 DRAWING_REVIEW_KEY'
+else:
+    KEY, _kp = _read_key_file()
+    KEY_SRC = ('key.txt：%s' % _kp) if KEY else '没有找到' 
 
 
 def machine_id():
@@ -206,12 +235,20 @@ def main():
         reason = body.get('reason') if isinstance(body, dict) else ''
         # v2.1.1 起云端对外只返回统一 invalid-key（细分原因只进服务端日志），
         # 客户端按通用话术提示，覆盖最常见的三种情况
-        print('⚠️ 授权未通过：Key 无效、已过期，或不匹配这台电脑。')
-        if reason:
-            print('   原因代码：%s' % reason)
+        mid = machine_id()
+        if not KEY:
+            print('⚠️ 没有找到授权码。')
+            print('   你这台电脑的机器码：M-%s-%s' % (mid[:4], mid[4:]))
+            print('   → 把这个机器码发给作者申领，或者把码单独存成 key.txt 放到 skill 目录下')
+        else:
+            print('⚠️ 授权未通过：Key 无效、已过期，或不匹配这台电脑。')
+            if reason:
+                print('   原因代码：%s' % reason)
+            print('   你这台电脑的机器码：M-%s-%s' % (mid[:4], mid[4:]))
+            print('   当前用的码：%s…%s（来源：%s）' % (KEY[:12], KEY[-4:], KEY_SRC))
+            print('   → 机器码变了 = 换了电脑，把上面这行发给作者换码')
+            print('   → 机器码没变 = 码抄错或过期，核对后存成 key.txt 再试')
         print(json.dumps(d, ensure_ascii=False, indent=2))
-        print('\n→ 取本机机器码：python scripts/ask_api.py --machine-id')
-        print('→ 把机器码发给作者重新申领授权码，再设为 DRAWING_REVIEW_KEY')
         return 2
     if code == 0:
         print('⚠️ 连不上服务：')
