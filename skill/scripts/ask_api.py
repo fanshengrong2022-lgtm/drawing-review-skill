@@ -250,6 +250,15 @@ def main():
             print('   → 机器码没变 = 码抄错或过期，核对后存成 key.txt 再试')
         print(json.dumps(d, ensure_ascii=False, indent=2))
         return 2
+    if code == 429:
+        b = d.get('body', d) if isinstance(d, dict) else {}
+        print('⚠️ 今天的调用额度用完了（北京时间 0 点自动重置）。')
+        detail = b.get('detail') if isinstance(b, dict) else None
+        if detail:
+            print('   已达：%s' % json.dumps(detail, ensure_ascii=False)[:200])
+        print('   正常审图一天用不到这个量。确实需要更高额度，联系作者说明用途。')
+        return 4
+
     if code == 0:
         print('⚠️ 连不上服务：')
         print(json.dumps(d, ensure_ascii=False, indent=2))
