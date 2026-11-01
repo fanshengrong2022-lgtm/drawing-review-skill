@@ -11,10 +11,10 @@
 
 一套给 AI 用的**图纸会审预审作业流程**。不是"帮你随便看看图"，是把会审前该做的动作排好顺序、定好判据、配好产出格式。
 
-包内只有**流程骨架**；**判定能力在云端**（19 条判定规则 + **1,851 条**审图条目：房建 1,571 / 道路 70 / 排水 77 / 桥梁 91 / 市政通用 42 + **10 主题 83 段**方法库，约 7.7 万字），凭授权码按次调用。
+包内只有**流程骨架**；**判定能力在云端**（22 条判定规则 + **2,225 条**审图条目：房建 1,571 / 变电站 137 / 装修 123 / 光伏 114 / 道路 70 / 排水 77 / 桥梁 91 / 市政通用 42 + **10 主题 83 段**方法库，约 7.7 万字），凭授权码按次调用。
 
 ```
-drawing-review/           ← 当前版本 v2.6.2
+drawing-review/           ← 当前版本 v3.7.0
 ├── SKILL.md              入口（先读这个，§3.0 是傻瓜默认剧本）
 ├── INSTALL.md            安装说明（含一键安装提示词）
 ├── references/           方法骨架 × 10
@@ -51,7 +51,20 @@ drawing-review/           ← 当前版本 v2.6.2
 | **数据自检** | Model / Paper / 文字 / 块 / 图层 / Xref 六处逐个报数，**"读不到"先怀疑自己读错**，不轻易下"没有"的结论 |
 | **叠图基准** | 以**轴线对轴线**认同一处，禁止靠图元坐标对位 |
 | **核冲突** | 《跨图比对表》报四个数：应比 / 实比 / 无法核 / 不一致 |
-| **出报告** | 三张汇总表 + 12 列销项表 + 6 张兜底清单 + 建议层 + 能力外清单，**附《质量自证表》**防"审得太少" |
+| **出报告** | 三张汇总表 + 14 列销项表（含**依据类型**与**施工视角**两列）+ 6 张兜底清单 + 建议层 + 能力外清单，**附《质量自证表》**防"审得太少" |
+
+## 报告多了两列（v3.7.0）
+
+以前报告告诉你"哪里不对"，这一版还告诉你**"凭什么说的"**：
+
+| 新增列 | 取值 | 作用 |
+|---|---|---|
+| **依据类型** | 规范类 / 经验类 / 待注明 | 规范类能写"依据 GB XXX 第 X.X 条"；经验类只能写"按行业做法"，**不许冒充规范** |
+| **施工视角** | 必改 / 建议改 / 提示 | 从现场施工角度看，这条不改会不会返工 |
+
+摘要是三个数：规范类几条、施工视角必改几条、两者都占几条。
+
+**两列都空的那条会被移出正文**，放进附录——避免"看着很多、其实一条都落不了地"。
 
 ## 适用 / 不适用
 
@@ -77,7 +90,7 @@ https://api.skillhub.cn/api/v1/download?slug=@user_ae723d96/drawing-review-free
 5. 不要改写 SKILL.md 和 references 里的任何内容
 ```
 
-装完 AI 应该报：**version 2.6.2 / references 10 个 / scripts 7 个**。
+装完 AI 应该报：**version 3.7.0 / references 10 个 / scripts 7 个**。
 报不出来，通常是解压多套了一层目录，或者放错了位置。
 
 ## 手动安装
@@ -167,7 +180,7 @@ It enforces six checkpoints: material completeness (drawings / material book / B
 
 **Scope**: drawing pre-review, cross-discipline interface checks, material-book reconciliation. **Not for**: structural calculation, fire performance-based design review, cost auditing, or statutory code review.
 
-**Architecture**: the skill ships with *process only*. The judgment engine (19 gating rules, 1,851 checklist items, 83 method sections in 10 topics) lives in the cloud and is called per-request with a license key.
+**Architecture**: the skill ships with *process only*. The judgment engine (22 gating rules, 2,225 checklist items, 83 method sections in 10 topics) lives in the cloud and is called per-request with a license key.
 
 **⚠️ Requires an agent with local command execution** (WorkBuddy / Claude Code / Cursor / Trae / OpenClaw). Pure chat assistants cannot run the scripts and therefore cannot produce a valid report.
 

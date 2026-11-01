@@ -43,7 +43,7 @@ https://api.skillhub.cn/api/v1/download?slug=@user_ae723d96/drawing-review-free
 5. 不要改写 SKILL.md 和 references 里的任何内容
 ```
 
-装完 AI 应该报：**version 2.6.1 / references 10 个 / scripts 7 个**。
+装完 AI 应该报：**version 3.7.0 / references 10 个 / scripts 7 个**。
 报不出来，说明解压多套了一层目录，或者放错了位置。
 
 ## 手动装（AI 装不了时）
@@ -144,7 +144,7 @@ https://api.skillhub.cn/api/v1/download?slug=@user_ae723d96/drawing-review-free
 
 ## 付费说明（免费版）
 
-- **判定规则库（19 条）+ 条目库（1,851 条：房建 1,571 / 道路 70 / 排水 77 / 桥梁 91 / 市政通用 42）+ 方法库（10 主题 83 段，约 7.7 万字）在云端**，按需调用
+- **判定规则库（22 条）+ 条目库（2,225 条：房建 1,571 / 变电站 137 / 装修 123 / 光伏 114 / 道路 70 / 排水 77 / 桥梁 91 / 市政通用 42）+ 方法库（10 主题 83 段，约 7.7 万字）在云端**，按需调用
 - 授权码无效 → 返回 **402 Payment-Needed**
 - 价格见 SkillHub 页面；测试期联系作者领 Key
 
