@@ -18,12 +18,13 @@
 ├── SKILL.md              入口（九个章节：能力 / 触发 / 加载顺序 / 边界 / 云端 / 八条错 / 顺序 / 适用范围 / 包含什么）
 ├── INSTALL.md            安装说明
 ├── references/           方法骨架 × 9
-└── scripts/              5 个脚本
+└── scripts/              6 个脚本
     ├── ask_api.py              云端判定引擎客户端
     ├── health_check.py         图纸体检单
     ├── report_check.py         报告自检
     ├── extract_hatch_leader.py 填充 / 引线提取
-    └── extract_material_tags.py 跨块拼装材料标注提取
+    ├── extract_material_tags.py 跨块拼装材料标注提取
+    └── grid_align.py           轴网提取与跨图比对（叠图）
 ```
 
 ## 它解决什么问题
@@ -60,12 +61,15 @@
 # 2) 装依赖
 pip install ezdxf pymupdf openpyxl
 
-# 3) 配授权码（只有一个变量）
+# 3) 取本机机器码（申请授权码时把这串发给作者）
+python scripts/ask_api.py --machine-id            # 输出 M-XXXX-XXXX
+
+# 4) 配授权码（只有一个变量）
 export DRAWING_REVIEW_KEY="skfg-你的授权码"      # Mac / Linux
 set DRAWING_REVIEW_KEY=skfg-你的授权码            # Windows CMD
 $env:DRAWING_REVIEW_KEY="skfg-你的授权码"         # Windows PowerShell
 
-# 4) 自检
+# 5) 自检
 python scripts/ask_api.py --health                # 应返回 ok:true
 python scripts/ask_api.py --rules --ids R14       # 能返回规则内容 = 授权码有效
 ```
@@ -108,7 +112,9 @@ python scripts/report_check.py <你的报告.md>
 判定规则库、审图条目库、方法细则全部在云端，需授权码按次调用。
 
 - 在 [SkillHub](https://skillhub.cn/skills/user_ae723d96/drawing-review-free) 评论区留言，或在本仓库提 Issue，说明用途即可
-- 一人一码，测试期免费
+- **一机一码**：码绑定你的机器码 —— 同一台电脑上多个 AI 工具（WorkBuddy / Cursor / Trae…）可共用一个码；换电脑需重新申请
+- **有效期精确到日**，写在码里（例：`skfg-20261230-…` = 2026 年 12 月 30 日到期；到期当天仍可用，次日起失效）
+- 测试期免费
 - **没有授权码时**：环境自检、图纸体检、报告模板这些本地能力照常可用，只是调不了云端判定
 
 ## 相关链接
